@@ -7,17 +7,24 @@ import os
 
 # Home cherokee directory:
 # http://10.5.5.9:8080/videos/DCIM/100GOPRO/
-
+#-----------------------------------------------------------------------\
+# Adjustments when testing within edison:
+# remove comments in init constructor
+# imshow method must be removed
+# path must be changed to /media/external...
+#-----------------------------------------------------------------------
 
 class CaptureImage:
     home_directory = "http://10.5.5.9:8080/videos/DCIM/100GOPRO/"
-    imageID = ""
+    imageID = "frame.jpeg"
+    targetID = "target.png"
     gopro = UC()
+    path = "/home/paul/workspace/BAD/captureImage"
 
     def __init__(self):
         print "hey"
-        self.gopro.turn_on()             # turn on the gopro
-        self.begin_capture()
+        #self.gopro.turn_on()             # turn on the gopro
+        #self.begin_capture()
 
     def capture_photo(self):
         self.gopro.enable_photo_mode()   # Enable still photos
@@ -41,21 +48,41 @@ class CaptureImage:
         self.gopro.turn_off()
 
 cap = CaptureImage()
-
 # Read in the images
-target_img = cv2.imread('targetimage.jpeg',0)  #image we are looking for 
-img = cv2.imread('currentframe.jpeg',0)        #current frame input, this will be camera frame input later.
-# use the orb object to capture the images keypoints and descriptors.
-orb = cv2.ORB_create()
-kp1, des1 = orb.detectAndCompute(target_img, None)       
-kp2, des2 = orb.detectAndCompute(img, None)
+os.chdir(cap.path)
+img1 = cv2.imread(cap.targetID,0)  #image we are looking for 
+os.chdir(cap.path + "/img")
+img2 = cv2.imread(cap.imageID,0)        #current frame input, this will be camera frame input later.
+t1 = time.time()
+surf = cv2.xfeatures2d.SURF_create(400)
+# find the keypoints and descriptors with SIFT
+kp1, des1 = surf.detectAndCompute(img1,None)
+kp2, des2 = surf.detectAndCompute(img2,None)
 
-# Use the brute force algorithm (temporary) to match like keypoints
-bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-matches = bf.match(des1,des2)
-hit = cv2.drawMatches(target_img,kp1,img,kp2,matches[:10],None, flags=2)
-if matches.len > 10:
-	os.chdir("/media/external/hits")
-	cv2.imwrite("hit.jpeg", hit)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# FLANN parameters
+FLANN_INDEX_KDTREE = 0
+index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+search_params = dict(checks=50)   # or pass empty dictionary
+ 
+flann = cv2.FlannBasedMatcher(index_params,search_params)
+  
+matches = flann.knnMatch(des1,des2,k=2)
+ 
+# Need to draw only good matches, so create a mask
+matchesMask = [[0,0] for i in xrange(len(matches))]
+ 
+# ratio test as per Lowe's paper
+for i,(m,n) in enumerate(matches):
+     if m.distance < 0.6*n.distance:
+         matchesMask[i]=[1,0]
+ 
+draw_params = dict(matchColor = (0,255,0),
+                    singlePointColor = (255,255,255),
+                    matchesMask = matchesMask,
+                    flags = 0)
+ 
+hit = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
+print (str(time.time()-t1) + " s")
+os.chdir(cap.path + "/hits")
+cv2.imwrite("hit.jpeg", hit)
+
