@@ -11,7 +11,7 @@ import os
 # Adjustments when testing within edison:
 # remove comments in init constructor
 # imshow method must be removed
-# path must be changed to /media/external...
+# path must be changed to /media/external... for the Edison sd card directory
 #-----------------------------------------------------------------------
 
 class CaptureImage:
@@ -30,7 +30,6 @@ class CaptureImage:
         self.gopro.enable_photo_mode()   # Enable still photos
         self.gopro.start_capture()       # capture a photo
         self.gopro.stop_capture()
-        time.sleep(1)
         self.get_photo()
 
     def capture_video(self):
@@ -69,20 +68,19 @@ flann = cv2.FlannBasedMatcher(index_params,search_params)
 matches = flann.knnMatch(des1,des2,k=2)
  
 # Need to draw only good matches, so create a mask
-matchesMask = [[0,0] for i in xrange(len(matches))]
+mask = [[0,0] for i in xrange(len(matches))]
  
-# ratio test as per Lowe's paper
+# lowe's ratio test to find elements within range
 for i,(m,n) in enumerate(matches):
      if m.distance < 0.6*n.distance:
-         matchesMask[i]=[1,0]
+         mask[i]=[1,0]
  
 draw_params = dict(matchColor = (0,255,0),
                     singlePointColor = (255,255,255),
-                    matchesMask = matchesMask,
+                    mask = mask,
                     flags = 0)
- 
+
 hit = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
 print (str(time.time()-t1) + " s")
 os.chdir(cap.path + "/hits")
 cv2.imwrite("hit.jpeg", hit)
-
