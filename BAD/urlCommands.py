@@ -180,21 +180,21 @@ class UrlCommands:
     # http://<ip>/camera/TI?t=<password>&p=%00
     def set_timer(self, tm):
         if tm == 0.5:
-            command = 00
+            command = "00"
         elif tm == 1:
-            command = 01
+            command = "01"
         elif tm == 2:
-            command = 02
+            command = "02"
         elif tm == 5:
-            command = 03
+            command = "03"
         elif tm == 10:
-            command = 04
+            command = "04"
         elif tm == 30:
-            command = 05
+            command = "05"
         elif tm == 60:
-            command = 06
+            command = "06"
         else:
-            print "Error occurred while setting camera's timer interval: " + tm + " is not a valid parameter"
+            print "Error occurred::<set_timer>::timer interval: " + tm + " is not a valid parameter"
             command = "00"
 
         device = "camera"
@@ -209,8 +209,9 @@ class UrlCommands:
         pattern = re.compile('\w\w\w\w\w\w\w\w.JPG"')                   # regular expression to find all JPG names
         files = pattern.findall(string)                                 # get the filenames into a list
         self.imageid = files[-1].replace('\"', "")
-        for i in os.listdir("media/external/img"):  # remove all previous images
-            os.remove(i)
+# This will staydisabled during the testing phase, in order to follow frames captured
+#        for i in os.listdir("media/external/img"):  # remove all previous images
+#            os.remove(i)
         urllib.urlretrieve(home_dir+self.imageid, self.imageid)         # get the last element from the list
 
     def get_image_id(self):
