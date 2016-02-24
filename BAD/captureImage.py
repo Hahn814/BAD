@@ -48,18 +48,20 @@ class CaptureImage:
 cap = CaptureImage()
 # Read in the images
 os.chdir(cap.path)
-img1 = cv2.imread(cap.targetID,0)  #image we are looking for 
+#image we are looking for 
+img1 = cv2.imread(cap.targetID,0)
 os.chdir(cap.path + "/img")
-img2 = cv2.imread(cap.imageID,0)        #current frame input, this will be camera frame input later.
-surf = cv2.xfeatures2d.SURF_create(400)
+#current frame input, this will be camera frame input later.
+img2 = cv2.imread(cap.imageID,0)
+orb = cv2.ORB_create()
 # find the keypoints and descriptors with SIFT
-kp1, des1 = surf.detectAndCompute(img1,None)
-kp2, des2 = surf.detectAndCompute(img2,None)
+kp1, des1 = orb.detectAndCompute(img1,None)
+kp2, des2 = orb.detectAndCompute(img2,None)
 
 # FLANN parameters
 FLANN_INDEX_KDTREE = 0
 index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-search_params = dict(checks=50)   # or pass empty dictionary
+search_params = dict(checks=50)   # lower the checks, faster the computation, but less accurate.
  
 flann = cv2.FlannBasedMatcher(index_params,search_params)
   
