@@ -1,5 +1,4 @@
-from urlCommands import UrlCommands as UC  # A collection of url commands to request go pro actions
-import time
+from urlCommands import UrlCommands as UC   # A collection of url commands to request go pro actions
 import cv2
 import numpy as np
 import os
@@ -22,7 +21,7 @@ class CaptureImage:
     path = "/home/paul/workspace/BAD/captureImage"
 
     def __init__(self):
-        print "hey"
+        print "Initializing GoPro.."
         #self.gopro.turn_on()             # turn on the gopro
         #self.begin_capture()
 
@@ -52,7 +51,6 @@ os.chdir(cap.path)
 img1 = cv2.imread(cap.targetID,0)  #image we are looking for 
 os.chdir(cap.path + "/img")
 img2 = cv2.imread(cap.imageID,0)        #current frame input, this will be camera frame input later.
-t1 = time.time()
 surf = cv2.xfeatures2d.SURF_create(400)
 # find the keypoints and descriptors with SIFT
 kp1, des1 = surf.detectAndCompute(img1,None)
@@ -81,6 +79,5 @@ draw_params = dict(matchColor = (0,255,0),
                     flags = 0)
 
 hit = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
-print (str(time.time()-t1) + " s")
 os.chdir(cap.path + "/hits")
 cv2.imwrite("hit.jpeg", hit)
