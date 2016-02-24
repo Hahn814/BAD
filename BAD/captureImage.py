@@ -21,16 +21,20 @@ class CaptureImage:
     path = "/home/paul/workspace/BAD/captureImage"
 
     def __init__(self):
+        # Make sure the GoPro is turned on, initialize settings and begin capture.
         print "Initializing GoPro.."
-        #self.gopro.turn_on()             # turn on the gopro
+        #self.gopro.turn_on()
         #self.begin_capture()
 
-    def capture_photo(self):
-        self.gopro.enable_photo_mode()   # Enable still photos
-        self.gopro.start_capture()       # capture a photo
+    def start_photo_thread(self):
+        # capture thread to capture photos during flight
+        self.gopro.start_capture()
         self.gopro.stop_capture()
-        self.get_photo()
 
+    def start_search_thread(self):
+        # thread to handle the URL requests, we dont want them to cause the captures to fall behind
+        self.get_photo()
+        
     def capture_video(self):
         self.gopro.enable_camera_mode()  # enable camera video mode
         self.gopro.start_capture()
@@ -40,8 +44,13 @@ class CaptureImage:
         self.imageID = self.gopro.get_image_id()
 
     def begin_capture(self):
-        self.capture_photo()
-
+        # Init all of the GoPro Settings to capture a photo
+        self.gopro.enable_photo_mode()
+        self.gopro.start_capture()
+        self.gopro.stop_capture()
+        self.start_search_thread()
+        self.start_photo_thread()
+        
     def shutdown(self):
         self.gopro.turn_off()
 
