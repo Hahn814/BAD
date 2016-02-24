@@ -11,10 +11,10 @@ import os
 # remove comments in init constructor
 # imshow method must be removed
 # path must be changed to /media/external... for the Edison sd card directory
+# home_directory = "http://10.5.5.9:8080/videos/DCIM/100GOPRO/"
 #-----------------------------------------------------------------------
 
 class CaptureImage:
-    home_directory = "http://10.5.5.9:8080/videos/DCIM/100GOPRO/"
     imageID = "frame.jpeg"
     targetID = "target.png"
     gopro = UC()
