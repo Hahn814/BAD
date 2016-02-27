@@ -19,7 +19,7 @@ class CaptureImage:
     imageID = "frame.jpeg"
     targetID = "target.png"
     gopro = UC()
-    path = "/home/paul/workspace/BAD/BAD/BAD"
+    path = "/media/external/"
 
     def __init__(self):
         # Make sure the GoPro is turned on, initialize settings and begin capture.
