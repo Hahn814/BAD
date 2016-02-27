@@ -2,6 +2,7 @@ from urlCommands import UrlCommands as UC   # A collection of url commands to re
 import cv2
 import numpy as np
 import os
+import time
 
 
 # Home cherokee directory:
@@ -18,7 +19,7 @@ class CaptureImage:
     imageID = "frame.jpeg"
     targetID = "target.png"
     gopro = UC()
-    path = "/media/external/"
+    path = "/home/paul/workspace/BAD/BAD/BAD"
 
     def __init__(self):
         # Make sure the GoPro is turned on, initialize settings and begin capture.
@@ -55,40 +56,49 @@ class CaptureImage:
         self.gopro.turn_off()
 
 cap = CaptureImage()
-# Read in the images
-os.chdir(cap.path)
-#image we are looking for 
-img1 = cv2.imread(cap.targetID,0)
-os.chdir(cap.path + "/img")
-#current frame input, this will be camera frame input later.
-img2 = cv2.imread(cap.imageID,0)
-orb = cv2.ORB_create()
-# find the keypoints and descriptors with SIFT
-kp1, des1 = orb.detectAndCompute(img1,None)
-kp2, des2 = orb.detectAndCompute(img2,None)
 
-# FLANN parameters
+# Collect the images captured
+os.chdir(cap.path)
+img1 = cv2.imread(cap.targetID,0)	# Target image from user.
+os.chdir(cap.path + "/img")
+img2 = cv2.imread(cap.imageID,0)	# Current frame from GoPro
+
+t1 = time.time()
+
+# Create the SURF object for keypoints and descriptors
+surf = cv2.xfeatures2d.SURF_create(400)
+kp1, des1 = surf.detectAndCompute(img1,None)	# Keypoints, Target
+kp2, des2 = surf.detectAndCompute(img2,None)	# Keypoints, Frame
+
+# FLANN parameters needed for flann matcher
 FLANN_INDEX_KDTREE = 0
 index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-search_params = dict(checks=50)   # lower the checks, faster the computation, but less accurate.
+search_params = dict(checks=50)   # higher the # = more accurate/slower
  
+# Create and match descriptors
 flann = cv2.FlannBasedMatcher(index_params,search_params)
-  
 matches = flann.knnMatch(des1,des2,k=2)
  
 # Need to draw only good matches, so create a mask
-mask = [[0,0] for i in xrange(len(matches))]
+matchesMask = [[0,0] for i in xrange(len(matches))]
  
-# lowe's ratio test to find elements within range
+# Lowe's ratio test to get the closest matching vectors
+good = []
 for i,(m,n) in enumerate(matches):
      if m.distance < 0.6*n.distance:
-         mask[i]=[1,0]
+         matchesMask[i]=[1,0]
+         good.append(m)	# Append the good match for count/comparison
  
+# Adjust the drawing parameters
 draw_params = dict(matchColor = (0,255,0),
                     singlePointColor = (255,255,255),
-                    mask = mask,
+                    matchesMask = matchesMask,
                     flags = 0)
 
+# Draw the image found and save to hits directory
 hit = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
+print (str(time.time()-t1) + " s " + 
+				"\nTotal Matches: "+ 
+				str(len(matches)))
 os.chdir(cap.path + "/hits")
 cv2.imwrite("hit.jpeg", hit)
