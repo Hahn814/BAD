@@ -31,11 +31,13 @@ class CaptureImage:
     def start_photo_thread(self):
         # capture thread to capture photos during flight
         print "Started " + threading.currentThread().getName() + " " + str(time.time())
-
+        print "Closed " + threading.currentThread().getName() + " " + str(time.time())
+        
     def start_search_thread(self):
         # thread to handle the URL requests, we dont want them to cause the captures to fall behind
         print "Started " + threading.currentThread().getName() + " " + str(time.time())
-
+        print "Closed " + threading.currentThread().getName() + " " + str(time.time())
+        
     def capture_video(self):
         self.gopro.enable_camera_mode()  # enable camera video mode
         self.gopro.start_capture()
