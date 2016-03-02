@@ -71,10 +71,14 @@ img2 = cv2.imread(cap.imageID,0)    # Current frame from GoPro
 
 t1 = time.time()
 
-# Create the SURF object for keypoints and descriptors
-surf = cv2.xfeatures2d.SURF_create(400)
-kp1, des1 = surf.detectAndCompute(img1,None)    # Keypoints, Target
-kp2, des2 = surf.detectAndCompute(img2,None)    # Keypoints, Frame
+# Create the ORB object
+orb = cv2.ORB_create()
+kp1 = orb.detect(img1,None)
+kp2 = orb.detect(img2,None)
+
+# Get the descriptors of each image
+kp1, des1 = orb.compute(img1, kp1)
+kp2, des2 = orb.compute(img2, kp1)
 
 # FLANN parameters needed for flann matcher
 FLANN_INDEX_KDTREE = 0
