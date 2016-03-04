@@ -204,11 +204,20 @@ class UrlCommands:
     # home_directory = "http://10.5.5.9:8080/videos/DCIM/100GOPRO/"
     def get_photo(self):
         home_dir = "http://" + self.ip + ":8080/videos/DCIM/100GOPRO/"  # Cherokee Web Server
-        path = urllib2.urlopen(home_dir)                                # Get the Cherokee URL
-        string = path.read()                                            # Get the HTML info from web server
-        pattern = re.compile('\w\w\w\w\w\w\w\w.JPG"')                   # regular expression to find all JPG names
-        files = pattern.findall(string)                                 # get the filenames into a list
-        self.imageid = files[-1].replace('\"', "")
+        repeat = True
+        
+        # Waiting for the server to update
+        while repeat == True:
+            path = urllib2.urlopen(home_dir)                                # Get the Cherokee URL
+            string = path.read()                                            # Get the HTML info from web server
+            pattern = re.compile('\w\w\w\w\w\w\w\w.JPG"')                   # regular expression to find all JPG names
+            files = pattern.findall(string)                                 # get the filenames into a list
+            temp = files[-1].replace('\"', "")
+            
+            if temp != self.imageid:
+                self.imageid = temp
+                repeat = False
+                
 # This will staydisabled during the testing phase, in order to follow frames captured
 #        for i in os.listdir("media/external/img"):  # remove all previous images
 #            os.remove(i)
