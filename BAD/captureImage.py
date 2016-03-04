@@ -20,7 +20,8 @@ class CaptureImage:
 
     def __init__(self):
         # Make sure the GoPro is turned on, initialize settings and begin capture.
-        self.imageID = "frame.jpeg"
+        self.imageID = ["frame.jpeg"]
+        self.current = "frame.jpeg"
         self.targetID = "target.png"
         self.goproURL = UC()
         self.path = os.getcwd()
@@ -30,86 +31,126 @@ class CaptureImage:
         
     def start_photo_thread(self):
         # capture thread to capture photos during flight
-        print "Started " + threading.currentThread().getName() + " " + str(time.time())
-        print "Closed " + threading.currentThread().getName() + " " + str(time.time())
+        t1 = time.time()
+        print "Started " + threading.currentThread().getName()
+        im_count = 2
+        
+        while 1:
+            # self.gopro.start_capture()
+            # self.gopro.stop_capture()  
+            im_count += 1  
+            
+        t2 = time.time() - t1
+        print "Closed " + threading.currentThread().getName() + " :: " + str(t2) + "s"
         
     def start_search_thread(self):
         # thread to handle the URL requests, we dont want them to cause the captures to fall behind
-        print "Started " + threading.currentThread().getName() + " " + str(time.time())
-        print "Closed " + threading.currentThread().getName() + " " + str(time.time())
+        print "Started " + threading.currentThread().getName()
+        img_count = "1"
+        t1 = time.time()
+        
+        while 1:
+            img_count += 1
+            self.imageID.append(self.get_photo())     # Add newest photo to list
+            
+        t2 = time.time() - t1
+        print "Closed " + threading.currentThread().getName() + " :: " + str(t2) + "s"
+        print "Frames Captured: " + str(img_count)
+        
+    def start_process_thread(self):
+        # Thread to process images left in stack
+        print "Started " + threading.currentThread().getName()
+        proc_count = 0
+        t1 = time.time()
+        hits = 0
+        
+        os.chdir(cap.path)
+        # Collect the images captured
+        img1 = cv2.imread(cap.targetID,0)   # Target image from user.
+        # Create the SURF object
+        surf = cv2.xfeatures2d.SURF_create(500)
+        kp1, des1 = surf.detectAndCompute(img1, None) # Detect target keypoints
+        
+        # FLANN parameters needed for flann matcher
+        FLANN_INDEX_KDTREE = 0
+        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+        search_params = dict(checks=50)   # higher the # = more accurate/slower
+        flann = cv2.FlannBasedMatcher(index_params,search_params)
+        
+        # While thread is executing capture images
+        # If index is going to be exceeded, wait until it is updated
+        while 1:
+            if (len(self.imageID) > proc_count):
+                os.chdir(cap.path + "/img")
+                img2 = cv2.imread(cap.imageID[proc_count],0)    # Current frame from GoPro
+                
+                # calculate current frames keypoints
+                kp2, des2 = surf.detectAndCompute(img2, None)
+                
+                # Create and match descriptors
+                matches = flann.knnMatch(des1,des2,k=2)
+                
+                # Need to draw only good matches, so create a mask
+                matchesMask = [[0,0] for i in xrange(len(matches))]
+                
+                # Lowe's ratio test to get the closest matching vectors
+                good = []
+                for i,(m,n) in enumerate(matches):
+                     if m.distance < 0.6*n.distance:
+                         matchesMask[i]=[1,0]
+                         good.append(m) # Append the good match for count/comparison
+                         
+                # Adjust the drawing parameters
+                draw_params = dict(matchColor = (0,255,0),
+                                    singlePointColor = (255,255,255),
+                                    matchesMask = matchesMask,
+                                    flags = 0)
+                                    
+                # Draw the image found and save to hits directory
+                hit = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
+                
+                # Write the hit to file
+                os.chdir(cap.path + "/hits")
+                cv2.imwrite("hit.jpeg", hit)
+                
+                if(len(good)>10):
+                    hits += 1
+                    print "Hit: " + str(hits) + ", Img KP Count: " + str(len(good))
+                    
+                proc_count += 1
+            
+        t2 = time.time() - t1
+        print "Closed " + threading.currentThread().getName() + " :: " + str(t2) + "s"
+        print "Hits: " + str(hits)
         
     def capture_video(self):
         self.gopro.enable_camera_mode()  # enable camera video mode
         self.gopro.start_capture()
 
     def get_photo(self):
-        self.gopro.get_photo()   # This will download the latest photo to the image directory
-        self.imageID = self.gopro.get_image_id()
+        # self.goproURL.get_photo()   # This will download the latest photo to the image directory
+        # return self.goproURL.get_image_id()
+        print "Get"
 
     def begin_capture(self):
         print "Init Threading.."
         # Init all of the GoPro Settings to capture a photo
-        # self.gopro.enable_photo_mode()
-        # self.gopro.start_capture()
-        # self.gopro.stop_capture()
-        self.start_search_thread()
-        self.start_photo_thread()
+        # self.goproURL.enable_photo_mode()
+        # self.goproURL.start_capture()
+        # self.goproURL.stop_capture()
+        # Create the capture and upload threads
+        t1 = threading.Thread(name="capture_thread", target=cap.start_photo_thread)
+        t2 = threading.Thread(name="cherokee_thread", target=cap.start_search_thread)
+        t3 = threading.Thread(name="process_thread", target=cap.start_process_thread)
+        # Start the threads for processing to begin
+        t1.start()
+        #t2.start()
+        t3.start()
         
     def shutdown(self):
-        self.gopro.turn_off()
+        self.goproURL.turn_off()
 
 cap = CaptureImage()
-# Create the capture and upload threads
-t1 = threading.Thread(name="capture_thread", target=cap.start_photo_thread)
-t2 = threading.Thread(name="cherokee_thread", target=cap.start_search_thread)
+cap.begin_capture()
 
-# Start the threads for processing to begin
-t1.start()
-t2.start()
-# Collect the images captured
-os.chdir(cap.path)
-img1 = cv2.imread(cap.targetID,0)   # Target image from user.
-os.chdir(cap.path + "/img")
-img2 = cv2.imread(cap.imageID,0)    # Current frame from GoPro
 
-t1 = time.time()
-
-# Create the ORB object
-surf = cv2.xfeatures2d.SURF_create(500)
-
-# Get the descriptors of each image
-kp1, des1 = surf.detectAndCompute(img1, None)
-kp2, des2 = surf.detectAndCompute(img2, None)
-
-# FLANN parameters needed for flann matcher
-FLANN_INDEX_KDTREE = 0
-index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-search_params = dict(checks=50)   # higher the # = more accurate/slower
- 
-# Create and match descriptors
-flann = cv2.FlannBasedMatcher(index_params,search_params)
-matches = flann.knnMatch(des1,des2,k=2)
- 
-# Need to draw only good matches, so create a mask
-matchesMask = [[0,0] for i in xrange(len(matches))]
- 
-# Lowe's ratio test to get the closest matching vectors
-good = []
-for i,(m,n) in enumerate(matches):
-     if m.distance < 0.6*n.distance:
-         matchesMask[i]=[1,0]
-         good.append(m) # Append the good match for count/comparison
- 
-# Adjust the drawing parameters
-draw_params = dict(matchColor = (0,255,0),
-                    singlePointColor = (255,255,255),
-                    matchesMask = matchesMask,
-                    flags = 0)
-
-# Draw the image found and save to hits directory
-hit = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
-print (str(time.time()-t1) + " s " + 
-                "\nTotal Matches: "+ 
-                str(len(matches)))
-os.chdir(cap.path + "/hits")
-cv2.imwrite("hit.jpeg", hit)
