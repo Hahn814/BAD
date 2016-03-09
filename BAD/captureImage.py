@@ -12,6 +12,7 @@ import threading
 # Adjustments when testing within edison:
 # remove comments in init constructor
 # imshow method must be removed
+# search thread : replace append frame with commented append command
 # path must be changed to /media/external... for the Edison sd card directory
 # home_directory = "http://10.5.5.9:8080/videos/DCIM/100GOPRO/"
 #-----------------------------------------------------------------------
@@ -39,6 +40,8 @@ class CaptureImage:
             # self.gopro.start_capture()
             # self.gopro.stop_capture()  
             im_count += 1  
+            time.sleep(5)
+            print threading.currentThread().getName() + "image count: " + str(im_count)
             
         t2 = time.time() - t1
         print "Closed " + threading.currentThread().getName() + " :: " + str(t2) + "s"
@@ -46,12 +49,15 @@ class CaptureImage:
     def start_search_thread(self):
         # thread to handle the URL requests, we dont want them to cause the captures to fall behind
         print "Started " + threading.currentThread().getName()
-        img_count = "1"
+        img_count = 1
         t1 = time.time()
         
         while 1:
             img_count += 1
-            self.imageID.append(self.get_photo())     # Add newest photo to list
+            self.imageID.append("frame.jpeg")
+            #self.imageID.append(self.get_photo())     # Add newest photo to list
+            time.sleep(5)
+            print threading.currentThread().getName() + "image count: " + str(img_count)
             
         t2 = time.time() - t1
         print "Closed " + threading.currentThread().getName() + " :: " + str(t2) + "s"
@@ -118,6 +124,7 @@ class CaptureImage:
                     print "Hit: " + str(hits) + ", Img KP Count: " + str(len(good))
                     
                 proc_count += 1
+                print threading.currentThread().getName() + "Process count: " + str(proc_count)
             
         t2 = time.time() - t1
         print "Closed " + threading.currentThread().getName() + " :: " + str(t2) + "s"
@@ -144,7 +151,7 @@ class CaptureImage:
         t3 = threading.Thread(name="process_thread", target=cap.start_process_thread)
         # Start the threads for processing to begin
         t1.start()
-        #t2.start()
+        t2.start()
         t3.start()
         
     def shutdown(self):
