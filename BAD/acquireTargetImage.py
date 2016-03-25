@@ -15,4 +15,5 @@ try:
 except FTP.all_errors as e:
     print "An error occured with the FTP connection\nError " + e
 
-getBinary("target.png")
+# command line argument is filename on server
+getBinary(sys.argv[2])
