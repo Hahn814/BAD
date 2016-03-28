@@ -8,6 +8,7 @@ def getBinary(filename, outfile=None):
         outfile = sys.stdout
 
     ftp.retrbinary("RETR " + "target.png", outfile.write)
+    sys.write(outfile)
 
 try:
     ftp = FTP("ftp://ndrives.calu.edu/")
