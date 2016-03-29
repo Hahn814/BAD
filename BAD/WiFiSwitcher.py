@@ -1,21 +1,25 @@
 from urlCommands import UrlCommands as UC
-import fileinput
 import os
 import sys
 
 if len(sys.argv) > 1:
-    fileLocation = "/etc/network/"      # Directory of the wifi configuration file
+    #fileLocation = "/etc/network/"      # Directory of the wifi configuration file
+    fileLocation = "/home/paul/workspace/BAD/BAD"      # Directory of the wifi configuration file
+
     fileToSearch = "interfaces"         # Wifi file name
     searchText1 = "wpa-ssid"            # tags to find correct line within file
     searchText2 = "wpa-psk"             # .
     valid = False
 
+    
     if sys.argv[1] == "network":
+        print sys.argv[1]
         WiFi = "wpa-ssid " + sys.argv[2]     # replacement lines
         Psk = "wpa-psk " + sys.argv[3]       # .
         valid = True
     else:
         if sys.argv[1] == "gopro":
+            print sys.argv[1]
             WiFi = "wpa-ssid " + UC.ip     # replacement lines
             Psk = "wpa-psk " + UC.pw       # .
             valid = True
@@ -23,18 +27,30 @@ if len(sys.argv) > 1:
     if valid:
         temp = os.getcwd()                  # capture original directory to return to afterward
         os.chdir(fileLocation)
-
-        f = open(fileToSearch , mode='wb')
+            
+        f = open(fileToSearch , mode='rb')
         fileContents = f.readlines()
-
+        print fileContents
+        
+        count = 0
         for line in fileContents:
+            
             if searchText1 in line:
-                line = WiFi
+                line = WiFi + "\n"
 
             else:
                 if searchText2 in line:
-                    line = Psk
-
+                    line = Psk + "\n"
+                    
+            fileContents[count] = line
+            count = count + 1
+        f.close()
+        
+        f = open(fileToSearch , mode='w+')
+        print fileContents
+        f.writelines(fileContents)
+        
+        
         os.chdir(temp)
     else:
         "WiFiSwitcher.py :: Argument used is not valid, valid syntax: \n" \
