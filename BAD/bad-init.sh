@@ -1,13 +1,10 @@
 echo "Initializing Beacon Autonomous Drone Software Dependencies."
-echo "disable driver libdc1394 :: ln /dev/null /dev/raw1394"
+echo "disable library libdc1394 :: ln /dev/null /dev/raw1394"
 ln /dev/null /dev/raw1394
-
-echo "/etc/network/ -> WiFi Interfaces "
-cd /etc/network/
 
 cd /home/BAD/BAD
 ifdown wlan0
-python WiFiSwitcher.py belkin.b1e eeff764d
+python WiFiSwitcher.py NetworkSSID NetworkPSK
 ifup wlan0
 
 echo "Searching network drive for user's target image.. CL param = target.png"
