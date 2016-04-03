@@ -147,12 +147,18 @@ class CaptureImage:
         # self.goproURL.stop_capture()
         # Create the capture and upload threads
         t1 = threading.Thread(name="capture_thread", target=cap.start_photo_thread)
+        t1.setDaemon(True)
         t2 = threading.Thread(name="cherokee_thread", target=cap.start_search_thread)
+        t1.setDaemon(True)
         t3 = threading.Thread(name="process_thread", target=cap.start_process_thread)
+        t1.setDaemon(True)
         # Start the threads for processing to begin
         t1.start()
         t2.start()
         t3.start()
+        t1.join()
+        t2.join()
+        t3.join()
         
     def shutdown(self):
         self.goproURL.turn_off()
