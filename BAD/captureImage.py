@@ -24,11 +24,11 @@ class CaptureImage:
         self.imageID = ["frame.jpeg"]
         self.current = "frame.jpeg"
         self.targetID = "target.png"
-        self.goproURL = UC()
+        self.gopro = UC()
         self.path = os.getcwd()
         print self.path
         print "Initializing GoPro.."
-        #self.gopro.turn_on()
+        self.gopro.turn_on()
         
     def start_photo_thread(self):
         # capture thread to capture photos during flight
@@ -37,10 +37,12 @@ class CaptureImage:
         im_count = 2
         
         while 1:
-            # self.gopro.start_capture()
-            # self.gopro.stop_capture()  
+            res = self.gopro.start_capture()
+            print res
+            res = self.gopro.stop_capture()  
+            print res
+            time.sleep(6)
             im_count += 1  
-            time.sleep(5)
             print threading.currentThread().getName() + "image count: " + str(im_count)
             
         t2 = time.time() - t1
@@ -54,8 +56,8 @@ class CaptureImage:
         
         while 1:
             img_count += 1
-            self.imageID.append("frame.jpeg")
-            #self.imageID.append(self.get_photo())     # Add newest photo to list
+            #self.imageID.append("frame.jpeg")
+            self.imageID.append(self.get_photo())     # Add newest photo to list
             time.sleep(5)
             print threading.currentThread().getName() + "image count: " + str(img_count)
             
@@ -135,16 +137,16 @@ class CaptureImage:
         self.gopro.start_capture()
 
     def get_photo(self):
-        # self.goproURL.get_photo()   # This will download the latest photo to the image directory
-        # return self.goproURL.get_image_id()
+        self.gopro.get_photo()   # This will download the latest photo to the image directory
+        return self.gopro.get_image_id()
         print "Get"
 
     def begin_capture(self):
         print "Init Threading.."
         # Init all of the GoPro Settings to capture a photo
-        # self.goproURL.enable_photo_mode()
-        # self.goproURL.start_capture()
-        # self.goproURL.stop_capture()
+        self.gopro.enable_photo_mode()
+        self.gopro.start_capture()
+        self.gopro.stop_capture()
         # Create the capture and upload threads
         t1 = threading.Thread(name="capture_thread", target=cap.start_photo_thread)
         t1.setDaemon(True)
@@ -161,7 +163,7 @@ class CaptureImage:
         t3.join()
         
     def shutdown(self):
-        self.goproURL.turn_off()
+        self.gopro.turn_off()
 
 cap = CaptureImage()
 cap.begin_capture()
