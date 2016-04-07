@@ -60,6 +60,7 @@ class UrlCommands:
         command = "01"
         current = "\tBACPAC:SH:01: * Start Capture"
         self.build_url(device, app, command)
+        return current
 
     def stop_capture(self):
         device = "bacpac"
@@ -67,6 +68,7 @@ class UrlCommands:
         command = "00"
         current = "\tBACPAC:SH:00: * Stop Capture"
         self.build_url(device, app, command)
+        return current
 
 # Camera preview methods on/off
 # http://<ip>/camera/PV?t=<password>&p=%02
@@ -203,7 +205,7 @@ class UrlCommands:
 
     # home_directory = "http://10.5.5.9:8080/videos/DCIM/100GOPRO/"
     def get_photo(self):
-        home_dir = "http://" + self.ip + ":8080/videos/DCIM/100GOPRO/"  # Cherokee Web Server
+        home_dir = "http://" + self.ip + ":8080/videos/DCIM/101GOPRO/"  # Cherokee Web Server
         repeat = True
         
         # Waiting for the server to update
