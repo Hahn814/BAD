@@ -9,6 +9,7 @@ import os
 class UrlCommands:
     pw = "SeniorProject"
     ip = "10.5.5.9"
+    ssid = "vinniesgopro"
     device = ""
     app = ""
     command = ""
