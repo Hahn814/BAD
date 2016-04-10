@@ -25,7 +25,6 @@ class UrlCommands:
         try:
             urllib2.urlopen(self.url)
             print self.url + " Command Sent.."
-            print self.current                  # print the command and current stored debug info
             current = ""
         except urllib2.URLError:
             print "An error occurred while attempting to retrieve url: " + self.url
@@ -38,6 +37,7 @@ class UrlCommands:
         command = "00"
         current = "\tBACPAC:PW:00: Power down.."
         self.build_url(device, app, command)
+        return device + app + command
 
     def turn_on(self):
         device = "bacpac"
@@ -45,6 +45,7 @@ class UrlCommands:
         command = "01"
         current = "\tBACPAC:PW:01: Power On.."
         self.build_url(device, app, command)
+        return device + app + command
 
     def change_mode(self):
         device = "bacpac"
@@ -52,6 +53,7 @@ class UrlCommands:
         command = "02"
         current = "\tBACPAC:PW:02: Change Mode."
         self.build_url(device, app, command)
+        return device + app + command
 
 # http://<ip>/bacpac/SH?t=<password>&p=%01
     def start_capture(self):
@@ -60,7 +62,7 @@ class UrlCommands:
         command = "01"
         current = "\tBACPAC:SH:01: * Start Capture"
         self.build_url(device, app, command)
-        return current
+        return device + app + command
 
     def stop_capture(self):
         device = "bacpac"
@@ -68,8 +70,7 @@ class UrlCommands:
         command = "00"
         current = "\tBACPAC:SH:00: * Stop Capture"
         self.build_url(device, app, command)
-        return current
-
+        return device + app + command
 # Camera preview methods on/off
 # http://<ip>/camera/PV?t=<password>&p=%02
     def preview_on(self):
@@ -85,6 +86,7 @@ class UrlCommands:
         command = "00"
         current = "\tCAMERA:PV:00: Preview Off"
         self.build_url(device, app, command)
+        return device + app + command
 
 # Camera mode methods
 # http://<ip>/camera/CM?t=<password>&p=%00
@@ -93,6 +95,7 @@ class UrlCommands:
         app = "CM"
         command = "00"
         self.build_url(device, app, command)
+        return device + app + command
 
     def enable_photo_mode(self):
         device = "camera"
@@ -100,24 +103,28 @@ class UrlCommands:
         command = "01"
         current = "\tCAMERA:CM:01: Photo Mode Enabled"
         self.build_url(device, app, command)
+        return device + app + command
 
     def enable_burst_mode(self):
         device = "camera"
         app = "CM"
         command = "02"
         self.build_url(device, app, command)
+        return device + app + command
 
     def enable_tl_mode(self):
         device = "camera"
         app = "CM"
         command = "03"
         self.build_url(device, app, command)
+        return device + app + command
 
     def enable_tl2_mode(self):
         device = "camera"
         app = "CM"
         command = "04"
         self.build_url(device, app, command)
+        return device + app + command
 
 # Camera orientation methods
 # http://<ip>/camera/UP?t=<password>&p=%00
@@ -126,12 +133,14 @@ class UrlCommands:
             app = "UP"
             command = "00"
             self.build_url(device, app, command)
+            return device + app + command
 
     def set_head_down(self):
             device = "camera"
             app = "UP"
             command = "01"
             self.build_url(device, app, command)
+            return device + app + command
 
 # Video resolution methods
 # http://<ip>/camera/VR?t=<password>&p=%00
@@ -158,6 +167,7 @@ class UrlCommands:
         device = "camera"
         app = "VR"
         self.build_url(device, app, command)
+        return device + app + command
 
     # methods to set photo resolutions
     # http://<ip>/camera/PR?t=<password>&p=%00
@@ -177,6 +187,7 @@ class UrlCommands:
         device = "camera"
         app = "PR"
         self.build_url(device, app, command)
+        return device + app + command
 
     # Camera timer settings
     # http://<ip>/camera/TI?t=<password>&p=%00
@@ -202,6 +213,7 @@ class UrlCommands:
         device = "camera"
         app = "TI"
         self.build_url(device, app, command)
+        return device + app + command
 
     # home_directory = "http://10.5.5.9:8080/videos/DCIM/100GOPRO/"
     def get_photo(self):
@@ -220,10 +232,15 @@ class UrlCommands:
                 self.imageid = temp
                 repeat = False
                 
+
+        urllib.urlretrieve(home_dir+self.imageid, self.imageid)         # get the last element from the list
+        print("Cherokee_Downloaded " + self.imageid)
+        return self.imageid
+                
 # This will staydisabled during the testing phase, in order to follow frames captured
 #        for i in os.listdir("media/external/img"):  # remove all previous images
 #            os.remove(i)
-        urllib.urlretrieve(home_dir+self.imageid, self.imageid)         # get the last element from the list
+
 
     def get_image_id(self):
         return self.imageid
