@@ -4,11 +4,12 @@ ln /dev/null /dev/raw1394
 
 cd /home/BAD/BAD
 ifdown wlan0
-python WiFiSwitcher.py NetworkSSID NetworkPSK
+python WiFiSwitcher.py network ssid psk
 ifup wlan0
 
 echo "Searching network drive for user's target image.. CL param = target.png"
-python acquireImageTarget.py target.png
+python acquireTargetImage.py target.png ndrives.calu.edu hah5158 Psk
+
 
 echo "Connecting to GoPro Independent WiFi Network.."
 echo "python WiFiSwitcher.py gopro"
