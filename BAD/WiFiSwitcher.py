@@ -2,8 +2,9 @@ from urlCommands import UrlCommands as UC
 import os
 import sys
 
+
 if len(sys.argv) > 1:
-    #fileLocation = "/etc/network/"      # Directory of the wifi configuration file
+    #fileLocation = "/etc/network/"                     # Directory of the wifi configuration file
     fileLocation = "/home/paul/workspace/BAD/BAD"      # Directory of the wifi configuration file
 
     fileToSearch = "interfaces"         # Wifi file name
@@ -20,7 +21,7 @@ if len(sys.argv) > 1:
     else:
         if sys.argv[1] == "gopro":
             print sys.argv[1]
-            WiFi = "wpa-ssid " + UC.ip     # replacement lines
+            WiFi = "wpa-ssid " + UC.ssid     # replacement lines
             Psk = "wpa-psk " + UC.pw       # .
             valid = True
 
@@ -53,7 +54,7 @@ if len(sys.argv) > 1:
         
         os.chdir(temp)
     else:
-        "WiFiSwitcher.py :: Argument used is not valid, valid syntax: \n" \
+        print "WiFiSwitcher.py :: Argument used is not valid, valid syntax: \n" \
             "\python WiFiSwitcher.py gopro \npython WiFiSwitcher.py wifiSSID wifiPSK "
 else:
     print "WiFiSwitcher.py :: Incorrect number of command line arguments used."
