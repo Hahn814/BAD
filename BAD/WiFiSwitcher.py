@@ -31,7 +31,6 @@ if len(sys.argv) > 1:
             
         f = open(fileToSearch , mode='rb')
         fileContents = f.readlines()
-        print fileContents
         
         count = 0
         for line in fileContents:
