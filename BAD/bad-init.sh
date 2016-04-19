@@ -19,4 +19,4 @@ python WiFiSwitcher.py gopro
 ifup wlan0
 
 echo "python captureimage.py"
-python captureimage.py
+python captureImage.py
