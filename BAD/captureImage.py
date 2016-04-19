@@ -176,4 +176,3 @@ class CaptureImage:
 cap = CaptureImage()
 cap.begin_capture()
 
-
