@@ -122,14 +122,18 @@ class CaptureImage:
                         # Draw the image found and save to hits directory
                         hit = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
                         
-                        # Write the hit to file
-                        os.chdir(cap.path + "/hits")
-                        cv2.imwrite("hit.jpeg", hit)
+                        
                         
                         if(len(good)>10):
                             hits += 1
                             print "Hit: " + str(hits) + ", Img KP Count: " + str(len(good))
-                            
+                            # Write the hit to file
+                            os.chdir(cap.path + "/hits")
+                            cv2.imwrite("hit"+str(i)+".jpeg", hit)
+                        else:
+                            os.chdir(cap.path + "/img")
+                            cv2.imwrite("img"+str(i)+".jpeg", hit)
+                        
                     proc_count += 1
                     print threading.currentThread().getName() + "Process count: " + str(proc_count)
             except:
