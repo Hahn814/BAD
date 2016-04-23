@@ -1,12 +1,13 @@
 import socket
 import subprocess
 
+subprocess.call("/home/BAD/BAD/python WiFiSwitcher.py network ssid psk")
 # Create an INET servee socket
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind socket to port and host
 # bind (address, port)
-serversocket.bind((socket.gethostname(), 80))
+serversocket.bind(('', 2016))
 
 # Listen for a single connection from the GCU
 serversocket.listen(1)
