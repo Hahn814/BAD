@@ -21,9 +21,6 @@ start /MIN /D"C:\Program Files (x86)\Mission Planner" MissionPlanner.exe
 echo Starting Target Collection Application 
 start /MIN /D"C:\Users\Paul\Documents\Visual Studio 2015\Projects\CollectTarget\CollectTarget\bin\Debug" CollectTarget.exe
 
-echo Starting Communication With Intel Edison
-start /MIN /D"C:\Users\Paul\BeaconDrone" notify.py
-
 pause
 exit
 
