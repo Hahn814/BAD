@@ -2,8 +2,6 @@ import socket
 import time
 import subprocess
 
-subprocess.call("/home/BAD/BAD/python WiFiSwitcher.py network ssid psk")
-
 # create an INET socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print "Attempting to notify Edison.."
