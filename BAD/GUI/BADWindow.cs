@@ -101,6 +101,9 @@ namespace CollectTarget
 
                 response.Close();
                 continueButton.Enabled = false;
+
+                errorMessage.AppendText("Execute notify script..\n");
+                System.Diagnostics.Process.Start("C:\\Users\\Paul\\BeaconDrone\\notify.py");
             }
             catch(Exception f)
             {
