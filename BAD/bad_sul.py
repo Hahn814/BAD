@@ -5,11 +5,12 @@ PORT_NUMBER = 2016
 
 # Command Line: python WiFiSwitcher.py network ssid psk
 subprocess.call(['python','WiFiSwitcher.py','network', 'ssid', 'psk'])
+
 # Create an INET servee socket
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 HOST_NAME =  socket.gethostbyname('0.0.0.0')
-# Bind socket to port and host
-# bind (address, port)
+
+# Bind the server socket to the port/host
 serversocket.bind((HOST_NAME, PORT_NUMBER))
 
 print "Listening on port " +  str(PORT_NUMBER) + " for startup message.. " + str(HOST_NAME)
