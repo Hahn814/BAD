@@ -1,3 +1,7 @@
-Paul Hahn
-John Derosa
-Vincent Vitolo
+California University of Pa
+---------------------------
+Name              Major/Minor
+----------------------------
+Paul Hahn:        CSC
+John Derosa:      CSC/CIS
+Vincent Vitolo:   CSC
